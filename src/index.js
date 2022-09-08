@@ -66,13 +66,41 @@ server.post('/sign-up', async (req, res) => {
     }
 
     try {
-        await db.collection('').insertOne(newUser);
+        await db.collection('users').insertOne(newUser);
     } catch (error) {
         console.log(error);
         return res.sendStatus(500);
     }
 
     res.status(201).send({ message:'Usuário criado.' });
+});
+
+server.post('/sign-in', async (req, res) => {
+    const { email, password } = req.body;
+
+    let user;
+
+    try {
+        user = await db.collection('users').findOne({ email });
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+        return res.status(401).send({ message:'Usuário e/ou senha inválida.' });
+    }
+
+    const token = uuid();
+
+    try {
+        await db.collection('sessions').insertOne({ userId: user._id, token });
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+
+    res.status(200).send({ email, token });
 });
 
 
