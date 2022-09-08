@@ -196,5 +196,37 @@ server.post('/record', async (req, res) => {
     res.sendStatus(201);
 });
 
+server.get('/record', async (req, res) => {
+    const token = req.headers.authorization?.replace('Bearer ');
+
+    if (!token) {
+        return res.sendStatus(401);
+    }
+    
+    let session;
+
+    try {
+        session = await db.collection('sessions').findOne({ token });
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+
+    if (!session) {
+        return res.sendStatus(404);
+    }
+
+    let userRecords;
+
+    try {
+        userRecords = await db.collection('records').findOne({ user:session.userId });
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+
+    res.status(201).send(userRecords?.records);
+});
+
 
 server.listen(5000, () => console.log('Listening on port 5000...'));
