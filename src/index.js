@@ -80,6 +80,9 @@ server.post('/sign-up', async (req, res) => {
 
     try {
         await db.collection('users').insertOne(newUser);
+        const userData = await db.collection('users').findOne({ name, email });
+        db.collection('records').insertOne({ user: userData._id, records:[] });
+
     } catch (error) {
         console.log(error);
         return res.sendStatus(500);
@@ -168,35 +171,21 @@ server.post('/record', async (req, res) => {
         return res.sendStatus(500);
     }
 
-    if (!userRecords) {
-        const newRecord = {
-            user:session.userId,
-            records:[record]
-        }
-
-        try {
-            db.collection('records').insertOne(newRecord);
-        } catch (error) {
-            console.log(error);
-            return res.sendStatus(500);
-        }
+    try {
+        db.collection('records').updateOne(
+            { user:session.userId },
+            { $push: { records: record } }
+        );
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
     }
-    else {
-        try {
-            db.collection('records').updateOne(
-                { user:session.userId },
-                { $push: { records: record } }
-            );
-        } catch (error) {
-            console.log(error);
-            return res.sendStatus(500);
-        }
-    }
+    
 
     res.sendStatus(201);
 });
 
-server.get('/record', async (req, res) => {
+server.get('/records', async (req, res) => {
     const token = req.headers.authorization?.replace('Bearer ');
 
     if (!token) {
@@ -225,7 +214,7 @@ server.get('/record', async (req, res) => {
         return res.sendStatus(500);
     }
 
-    res.status(201).send(userRecords?.records);
+    res.status(201).send(userRecords.records);
 });
 
 
