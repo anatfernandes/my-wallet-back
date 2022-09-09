@@ -123,11 +123,11 @@ server.post('/sign-in', async (req, res) => {
         return res.sendStatus(500);
     }
 
-    res.status(200).send({ email, token });
+    res.status(200).send({ name:user.name, email, token });
 });
 
 server.post('/record', async (req, res) => {
-    const token = req.headers.authorization?.replace('Bearer ');
+    const token = req.headers.authorization?.replace('Bearer ', '');
     const { details, price, type } = req.body;
 
     let record = {
@@ -181,12 +181,11 @@ server.post('/record', async (req, res) => {
         return res.sendStatus(500);
     }
     
-
     res.sendStatus(201);
 });
 
 server.get('/records', async (req, res) => {
-    const token = req.headers.authorization?.replace('Bearer ');
+    const token = req.headers.authorization?.replace('Bearer ', '');
 
     if (!token) {
         return res.sendStatus(401);
