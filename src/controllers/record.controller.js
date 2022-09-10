@@ -12,10 +12,10 @@ const recordSchema = joi.object({
 });
 
 async function createRecord (req, res) {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const { session } = res.locals;
     const { details, price, type } = req.body;
 
-    let record = {
+    const record = {
         id: +new Date(),
         date: new Date().toLocaleDateString('pt-br'),
         details,
@@ -23,28 +23,11 @@ async function createRecord (req, res) {
         type
     };
 
-    if (!token) {
-        return res.sendStatus(401);
-    }
-
     const isValid = recordSchema.validate(record, { abortEarly: false });
 
     if (isValid.error) {
         const errors = isValid.error.details.map(({ message }) => message);
         return res.status(400).send({ message:errors });
-    }
-
-    let session;
-
-    try {
-        session = await db.collection('sessions').findOne({ token });
-    } catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
-
-    if (!session) {
-        return res.sendStatus(404);
     }
 
     let userRecords;
@@ -70,24 +53,7 @@ async function createRecord (req, res) {
 }
 
 async function getRecords (req, res) {
-    const token = req.headers.authorization?.replace('Bearer ', '');
-
-    if (!token) {
-        return res.sendStatus(401);
-    }
-    
-    let session;
-
-    try {
-        session = await db.collection('sessions').findOne({ token });
-    } catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
-
-    if (!session) {
-        return res.sendStatus(404);
-    }
+    const { session } = res.locals;
 
     let userRecords;
 

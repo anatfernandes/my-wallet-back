@@ -18,6 +18,7 @@ const loginSchema = joi.object({
 
 async function SignUp (req, res) {
     const { name, email, password } = req.body;
+    const { user: hasUser } = res.locals;
 
     const user = {
         name,
@@ -30,15 +31,6 @@ async function SignUp (req, res) {
     if (isValid.error) {
         const errors = isValid.error.details.map(({ message }) => message);
         return res.status(400).send({ message:errors });
-    }
-
-    let hasUser;
-
-    try {
-        hasUser = await db.collection('users').findOne({ email });
-    } catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
     }
 
     if (hasUser) {
@@ -67,21 +59,13 @@ async function SignUp (req, res) {
 
 async function SignIn (req, res) {
     const { email, password } = req.body;
+    const { user } = res.locals;
 
     const isValid = loginSchema.validate({ email, password }, { abortEarly: false });
 
     if (isValid.error) {
         const errors = isValid.error.details.map(({ message }) => message);
         return res.status(400).send({ message:errors });
-    }
-
-    let user;
-
-    try {
-        user = await db.collection('users').findOne({ email });
-    } catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
     }
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
