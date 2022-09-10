@@ -4,6 +4,7 @@ const db = await mongo();
 
 async function userExistMiddleware (req, res, next) {
     const { email } = req.body;
+
     let user;
 
     try {

@@ -3,13 +3,7 @@ import mongo from '../database/db.js';
 
 const db = await mongo();
 
-const recordSchema = joi.object({
-    id: joi.number(),
-    date: joi.string(),
-    details: joi.string().required().max(20),
-    price: joi.string().required(),
-    type: joi.string().required()
-});
+
 
 async function createRecord (req, res) {
     const { session } = res.locals;
@@ -22,13 +16,6 @@ async function createRecord (req, res) {
         price,
         type
     };
-
-    const isValid = recordSchema.validate(record, { abortEarly: false });
-
-    if (isValid.error) {
-        const errors = isValid.error.details.map(({ message }) => message);
-        return res.status(400).send({ message:errors });
-    }
 
     let userRecords;
 
