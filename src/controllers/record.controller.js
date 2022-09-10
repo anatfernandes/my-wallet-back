@@ -7,17 +7,8 @@ async function createRecord (req, res) {
     const { session } = res.locals;
     const { details, price, type } = req.body;
 
-    let userRecords;
-
-    try {
-        userRecords = await db.collection('records').findOne({ user:session.userId });
-    } catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
-
     const record = {
-        id: userRecords.records.length + 1,
+        id: +new Date(),
         date: new Date().toLocaleDateString('pt-br'),
         details,
         price,
@@ -54,7 +45,7 @@ async function getRecords (req, res) {
 
 async function deleteRecord (req, res) {
     const { session } = res.locals;
-    const { idRecord } = req.params;
+    const idRecord = Number(req.params.idRecord);
 
     let data;
 
@@ -65,14 +56,12 @@ async function deleteRecord (req, res) {
         return res.sendStatus(500);
     }
 
-    if (!data.records[idRecord]) return res.sendStatus(404);
-    
-    data.records.splice((idRecord - 1), 1);
+    const newRecords = data.records.filter(({ id }) => id !== idRecord);
 
     try {
         await db.collection('records').updateOne(
             { user:session.userId },
-            { $set: { records: data.records } }
+            { $set: { records: newRecords } }
         );
     } catch (error) {
         console.log(error);
@@ -82,4 +71,45 @@ async function deleteRecord (req, res) {
     res.sendStatus(200);
 }
 
-export { createRecord, getRecords, deleteRecord };
+async function updateRecord (req, res) {
+    const { session } = res.locals;
+    const { details, price, type } = req.body;
+    const idRecord = Number(req.params.idRecord);
+
+    let data;
+
+    try {
+        data = await db.collection('records').findOne({ user:session.userId });
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+
+    const records = data.records.map(record => {
+        
+        if (record.id === idRecord) {
+            return {
+                ...record,
+                details: details,
+                price: price,
+                type: type
+            }
+        } else {
+            return record;
+        }
+    });
+
+    try {
+        await db.collection('records').updateOne(
+            { user:session.userId },
+            { $set: { records: records } }
+        );
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+
+    res.sendStatus(200);
+}
+
+export { createRecord, getRecords, deleteRecord, updateRecord };
