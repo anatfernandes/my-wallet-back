@@ -5,8 +5,11 @@ import bcrypt from 'bcrypt';
 const db = await mongo();
 
 async function SignUp (req, res) {
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
+    let { name } = req.body;
     const { user: hasUser } = res.locals;
+
+    name = stripHtml(name).result.trim();
 
     if (hasUser) {
         return res.status(409).send({ message:'Usuário já existe.' });

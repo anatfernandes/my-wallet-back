@@ -1,3 +1,4 @@
+import { stripHtml } from 'string-strip-html';
 import mongo from '../database/db.js';
 
 const db = await mongo();
@@ -5,7 +6,11 @@ const db = await mongo();
 
 async function createRecord (req, res) {
     const { session } = res.locals;
-    const { details, price, type } = req.body;
+    let { details, price, type } = req.body;
+
+    details = stripHtml(details).result.trim();
+    price = stripHtml(price).result.trim();
+    type = stripHtml(type).result.trim();
 
     const record = {
         id: +new Date(),

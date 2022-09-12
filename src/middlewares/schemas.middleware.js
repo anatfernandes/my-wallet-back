@@ -1,9 +1,15 @@
+import { stripHtml } from 'string-strip-html';
+
 import loginSchema from "../schemas/login.schema.js";
 import recordSchema from "../schemas/record.schema.js";
 import userSchema from "../schemas/user.schema.js";
 
 function recordSchemaMiddleware (req, res, next) {
-    const { details, price, type } = req.body;
+    let { details, price, type } = req.body;
+
+    details = stripHtml(details).result.trim();
+    price = stripHtml(price).result.trim();
+    type = stripHtml(type).result.trim();
 
     const record = {
         id: +new Date(),
@@ -23,8 +29,11 @@ function recordSchemaMiddleware (req, res, next) {
     next();
 }
 
-function userSchemaMiddleware (req, res, next) {
-    const { name, email, password } = req.body;
+function signUpSchemaMiddleware (req, res, next) {
+    const { email, password } = req.body;
+    let { name } = req.body;
+
+    name = stripHtml(name).result.trim();
 
     const user = {
         name,
@@ -57,6 +66,6 @@ function loginSchemaMiddleware (req, res, next) {
 
 export {
     recordSchemaMiddleware,
-    userSchemaMiddleware,
+    signUpSchemaMiddleware,
     loginSchemaMiddleware
 }
