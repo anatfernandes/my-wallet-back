@@ -8,11 +8,11 @@ const router = express.Router();
 router.use(hasUserMiddleware);
 
 router.get('/records', getRecords);
-router.delete('/records/:idRecord', deleteRecord);
+router.delete('/records/delete/:idRecord', deleteRecord);
 
 router.use(recordSchemaMiddleware);
 
 router.post('/record', createRecord);
-router.put('/record/:idRecord', updateRecord);
+router.put('/record/edit/:idRecord', updateRecord);
 
 export default router;

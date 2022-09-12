@@ -9,7 +9,7 @@ router.post('/logout', LogOut);
 
 router.use(userExistMiddleware);
 
-router.post('/sign-up', signUpSchemaMiddleware, SignUp);
-router.post('/sign-in', loginSchemaMiddleware, SignIn);
+router.post('/signup', signUpSchemaMiddleware, SignUp);
+router.post('/signin', loginSchemaMiddleware, SignIn);
 
 export default router;
