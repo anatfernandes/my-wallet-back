@@ -64,4 +64,30 @@ async function SignIn (req, res) {
     res.status(200).send({ name:user.name, email, token });
 }
 
-export { SignUp, SignIn };
+async function LogOut (req, res) {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) return res.sendStatus(401);
+
+    let session;
+
+    try {
+        session = await db.collection('sessions').findOne({ token });
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+
+    if (!session) return res.sendStatus(404);
+
+    try {
+        await db.collection('sessions').deleteOne({ token });
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+
+    res.sendStatus(200);
+}
+
+export { SignUp, SignIn, LogOut };
