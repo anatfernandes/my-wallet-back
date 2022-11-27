@@ -4,7 +4,6 @@ import cors from 'cors';
 import authRouters from './routers/auth.routers.js';
 import recordRouters from './routers/record.routers.js';
 
-
 dotenv.config();
 
 const server = express();
@@ -15,4 +14,6 @@ server.use(express.json());
 server.use(authRouters);
 server.use(recordRouters);
 
-server.listen(5000, () => console.log('Listening on port 5000...'));
+const PORT = process.env.PORT || 5000;
+
+server.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
