@@ -1,6 +1,7 @@
 import mongo from '../database/db.js';
 import { v4 as uuid } from 'uuid';
 import bcrypt from 'bcrypt';
+import { stripHtml } from 'string-strip-html';
 
 const db = await mongo();
 
