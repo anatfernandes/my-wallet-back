@@ -5,7 +5,7 @@ import recordSchema from "../schemas/record.schema.js";
 import userSchema from "../schemas/user.schema.js";
 
 function recordSchemaMiddleware (req, res, next) {
-    let { details, price, type } = req.body;
+    let { details = "", price = "", type = "" } = req.body;
 
     details = stripHtml(details).result.trim();
     price = stripHtml(price).result.trim();
