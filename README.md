@@ -142,7 +142,7 @@ URL base: `https://my-wallet.herokuapp.com`
 
 1. Clone esse repositório:
 >```ruby
-> https://github.com/AnaLTFernandes/my-wallet-back.git
+> git clone https://github.com/AnaLTFernandes/my-wallet-back.git
 >```
 
 2. Instale as dependências:
